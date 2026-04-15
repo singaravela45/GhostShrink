@@ -7,12 +7,20 @@ from flask_cors import CORS
 from botocore.exceptions import NoCredentialsError, ClientError
 from utils.image_compress import compress_image
 from utils.pdf_compress import compress_pdf
+from werkzeug.exceptions import RequestEntityTooLarge
 
 app = Flask(__name__)
-CORS(app)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+CORS(app, resources={r"/*": {"origins": "https://d3czexl0bjlprf.cloudfront.net"}})
 
 BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", "your-localshrink-bucket")
 TEMP_DIR = "/tmp" 
+
+@app.errorhandler(413)
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    return jsonify({"error": "File is too large. Max limit is 16MB."}), 413
+
 
 s3_client = boto3.client('s3')
 
