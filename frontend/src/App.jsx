@@ -19,7 +19,7 @@ export default function App() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("compression", compression);
-      const res = await fetch("http://127.0.0.1:5000/upload", {
+      const res = await fetch("http://43.205.233.72/upload", { // change the url of the ec2 container
         method: "POST",
         body: formData,
       });
